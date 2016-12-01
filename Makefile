@@ -1,6 +1,8 @@
 # C++ Compiler and options
 CPP=g++ -Wall -g -O3
 
+# Path to dopewild (e.g. dopewildtl/include)
+DOP_INCL=dopewildtl/include
 # Path to hogwild (e.g. hogwildtl/include)
 HOG_INCL=hogwildtl/include
 # Path to Hazy Template Library (e.g. hazytl/include)
@@ -33,7 +35,7 @@ bin/tracenorm: obj/frontend.o
 	$(CPP) -o bin/tracenorm src/tracenorm.cc -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
 		obj/frontend.o
 
-bin/predict: 
+bin/predict:
 	$(CPP) -o bin/predict src/tracenorm/predict.cc -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
 		obj/frontend.o
 
@@ -50,13 +52,17 @@ bin/bbmulticut: obj/frontend.o
 		obj/frontend.o
 
 bin/convert: src/tools/tobinary.cc
-	$(CPP) -o bin/convert src/tools/tobinary.cc -I$(HOG_INCL) -I$(HTL_INCL) 
+	$(CPP) -o bin/convert src/tools/tobinary.cc -I$(HOG_INCL) -I$(HTL_INCL)
 
 bin/convert_matlab: src/tools/tobinary.cc
 	$(CPP) -o bin/convert_matlab src/tools/tobinary.cc -I$(HOG_INCL) -I$(HTL_INCL) -DMATLAB_CONVERT_OFFSET=1
 
 bin/unconvert: src/tools/unconvert.cc
-	$(CPP) -o bin/unconvert src/tools/unconvert.cc -I$(HOG_INCL) -I$(HTL_INCL) 
+	$(CPP) -o bin/unconvert src/tools/unconvert.cc -I$(HOG_INCL) -I$(HTL_INCL)
+
+bin/cfsvm: obj/frontend.o
+	$(CPP) -o bin/cfsvm src/cfsvm_main.cc -I$(DOP_INCL) -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
+		obj/frontend.o
 
 clean:
 	rm -f $(ALL)
