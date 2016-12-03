@@ -29,6 +29,7 @@
 #include "svm/svm_exec.h"
 
 
+using dopewild::CacheFriendlyHogwild;
 // Hazy imports
 using namespace hazy;
 using namespace hazy::hogwild;

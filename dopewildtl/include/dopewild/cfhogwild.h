@@ -2,12 +2,14 @@
 #define DOPEWILD_CFHOGWILD_H
 
 #include "hazy/vector/fvector.h"
-#include "hazy/hogwild.h"
+#include "hazy/hogwild/hogwild-inl.h"
+#include "hazy/hogwild/hogwild_task.h"
 
 namespace dopewild {
 
 using hazy::vector::FVector;
 using hazy::hogwild::Hogwild;
+using hazy::hogwild::HogwildTask;
 
 /*! \brief Cache-friendly Hogwild! parallel executor
  */
@@ -29,32 +31,33 @@ class CacheFriendlyHogwild{
 
   class CacheFriendlyExec {
    public:
-    template<class CacheFriendlyTask>
-    static double UpdateModel(CacheFriendlyTask &cftask, unsigned tid, unsigned total) {
+    template<class Example>
+    static double UpdateModel(HogwildTask<CacheFriendlyModel, Params, Example> &cftask, unsigned tid, unsigned total) {
       HogwildTask<Model, Params, Example> task;
       task.model = cftask.model->models.values[tid];
       task.params = cftask.params;
       task.block = cftask.block;
-      return Exec::UpdateModel(task, tid, total)
+      return Exec::UpdateModel(task, tid, total);
     }
 
-    static double TestModel(SVMTask &task, unsigned tid, unsigned total) {
+    template<class Example>
+    static double TestModel(HogwildTask<CacheFriendlyModel, Params, Example> &cftask, unsigned tid, unsigned total) {
       HogwildTask<Model, Params, Example> task;
       task.model = cftask.model->models.values[tid];
       task.params = cftask.params;
       task.block = cftask.block;
-      return Exec::TestModel(task, tid, total)
+      return Exec::TestModel(task, tid, total);
     }
 
     // static void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
     //   for (int i = 0; i < cfmodel.models.size; i++) {
-    //     Exec::PostUpdate(*cfmodel.models.values[i]);
+    //     Exec::PostUpdate(*cfmodel.models.values[i], params);
     //   }
     // }
 
     static void PostEpoch(CacheFriendlyModel &cfmodel, Params &params) {
       for (int i = 0; i < cfmodel.models.size; i++) {
-        Exec::PostEpoch(*cfmodel.models.values[i]);
+        Exec::PostEpoch(*cfmodel.models.values[i], params);
       }
     }
   };
