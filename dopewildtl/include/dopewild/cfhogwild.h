@@ -13,7 +13,7 @@ using hazy::hogwild::HogwildTask;
 
 /*! \brief Cache-friendly Hogwild! parallel executor
  */
-template<class Model, class Params, class Exec>
+template<class Model, class Params, class Exec, class Example>
 class CacheFriendlyHogwild{
 
   struct CacheFriendlyModel {
@@ -31,7 +31,6 @@ class CacheFriendlyHogwild{
 
   class CacheFriendlyExec {
    public:
-    template<class Example>
     static double UpdateModel(HogwildTask<CacheFriendlyModel, Params, Example> &cftask, unsigned tid, unsigned total) {
       HogwildTask<Model, Params, Example> task;
       task.model = cftask.model->models.values[tid];
@@ -40,7 +39,6 @@ class CacheFriendlyHogwild{
       return Exec::UpdateModel(task, tid, total);
     }
 
-    template<class Example>
     static double TestModel(HogwildTask<CacheFriendlyModel, Params, Example> &cftask, unsigned tid, unsigned total) {
       HogwildTask<Model, Params, Example> task;
       task.model = cftask.model->models.values[tid];
@@ -64,22 +62,22 @@ class CacheFriendlyHogwild{
 
  public:
   CacheFriendlyHogwild(Model &m, Params &p, hazy::thread::ThreadPool &tpool) :
-      hogwild(CacheFriendlyModel(m, tpool.ThreadCount()), p, tpool) {}
+      cfhogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool) {}
 
   template <class TrainScan, class TestScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
                      TrainScan &trscan, TestScan &tescan) {
-    hogwild.RunExperiment(nepochs, wall_clock, trscan, tescan);
+    cfhogwild.RunExperiment(nepochs, wall_clock, trscan, tescan);
   }
 
   template <class TrainScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
                      TrainScan &trscan) {
-    hogwild.RunExperiment(nepochs, wall_clock, trscan);
+    cfhogwild.RunExperiment(nepochs, wall_clock, trscan);
   }
 
  private:
-  Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> hogwild;
+  Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> cfhogwild;
 };
 
 } // namespace dopewild

@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
   hazy::thread::ThreadPool tpool(nthreads);
   tpool.Init();
   MemoryScan<SVMExample> mscan(train_examps);
-  CacheFriendlyHogwild<SVMModel, SVMParams, SVMExec>  hw(m, tp, tpool);
+  CacheFriendlyHogwild<SVMModel, SVMParams, SVMExec, SVMExample>  hw(m, tp, tpool);
   MemoryScan<SVMExample> tscan(test_examps);
 
   hw.RunExperiment(nepochs, wall_clock, mscan, tscan);
