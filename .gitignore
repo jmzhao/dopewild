@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+
+# compiled libraries
+obj/
+bin/
+
+# datasets
+data
+
