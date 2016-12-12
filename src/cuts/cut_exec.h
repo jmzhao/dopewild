@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #ifndef HAZY_HOGWILD_INSTANCES_CUTS_CUT_EXEC_H
 #define HAZY_HOGWILD_INSTANCES_CUTS_CUT_EXEC_H
@@ -48,14 +48,14 @@ load_intlist(char *fname) {
 //! Clips to between [0, 1]
 double clip(double v) { return std::min(std::max(v, 0.0),1.0); }
 //1 Returns the sign (as 1 or -1) of v
-double sign(double v) { if(v == 0.0) return 0.0; 
+double sign(double v) { if(v == 0.0) return 0.0;
   return (v > 0.0) ? 1.0 : -1.0; }
 
 //! Updates the model using the given example
 /*! This is a razy operation that will cause terrible cache behavior, most
  * likely.
  */
-void ModelUpdate(types::Entry const &e, CutParams const &params, 
+void ModelUpdate(types::Entry const &e, CutParams const &params,
                  CutModel &model) {
   int row_index = e.row;
   int col_index = e.col;
@@ -67,7 +67,7 @@ void ModelUpdate(types::Entry const &e, CutParams const &params,
     double   y = col_model.values[d];
     double err = weight*sign(x - y);
     row_model.values[d] = x - params.stepsize*err;
-    col_model.values[d] = y + params.stepsize*err;     
+    col_model.values[d] = y + params.stepsize*err;
   }
   vector::SimplexProject(row_model);
   vector::SimplexProject(col_model);
@@ -102,7 +102,7 @@ float ZeroOneLoss(CutModel const &m, types::Entry const &e) {
   for(int d = 0; d < dmax; d++) {
     double rv = m.get(row_index, d);
     double cv = m.get(col_index, d);
-    if(rv > row_max) { 
+    if(rv > row_max) {
       row_max_index = d ;
       row_max       = rv;
     }
@@ -177,7 +177,6 @@ class CutExec {
     p.stepsize *= p.step_diminish;
   }
   static void PostEpoch(CutModel &m, CutParams &p) {
-    p.stepsize *= p.step_diminish;
   }
 };
 
