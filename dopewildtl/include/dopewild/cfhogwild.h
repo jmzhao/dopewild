@@ -47,11 +47,17 @@ class CacheFriendlyHogwild{
       return Exec::TestModel(task, tid, total);
     }
 
-    // static void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
-    //   for (int i = 0; i < cfmodel.models.size; i++) {
-    //     Exec::PostUpdate(*cfmodel.models.values[i], params);
-    //   }
-    // }
+    static void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
+      for (int i = 0; i < cfmodel.models.size; i++) {
+        Exec::PostUpdate(*cfmodel.models.values[i], params);
+      }
+
+      //! Aggregate models into the first model
+      Exec::Aggregate(cfmodel.models, params);
+      for (int i = 1; i < cfmodel.models.size; i++) {
+        cfmodel.models.values[i]->CopyFrom(*cfmodel.models.values[0]);
+      }
+    }
 
     static void PostEpoch(CacheFriendlyModel &cfmodel, Params &params) {
       for (int i = 0; i < cfmodel.models.size; i++) {
@@ -62,7 +68,8 @@ class CacheFriendlyHogwild{
 
  public:
   CacheFriendlyHogwild(Model &m, Params &p, hazy::thread::ThreadPool &tpool) :
-      cfhogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool) {}
+      cfhogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
+      {}
 
   template <class TrainScan, class TestScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
