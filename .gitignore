@@ -39,3 +39,6 @@ bin/
 # datasets
 data
 
+# logs
+log
+*.log
