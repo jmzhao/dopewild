@@ -173,6 +173,17 @@ class CutExec {
     return loss;
   }
 
+  //! Aggregate several peer models into the first model
+  static void Aggregate(vector::FVector<CutModel*> &models, CutParams &params) {
+    CutModel* aggregated_model = models.values[0];
+    for (unsigned i = 1; i < models.size; i++) {
+      CutModel* model = models.values[i];
+      aggregated_model->Add(*model);
+    }
+    aggregated_model->AverageBy(models.size);
+
+  }
+
   static void PostUpdate(CutModel &m, CutParams &p) {
     p.stepsize *= p.step_diminish;
   }

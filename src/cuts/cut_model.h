@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #ifndef HAZY_HOGWILD_INSTANCES_CUTS_CUT_MODEL_H
 #define HAZY_HOGWILD_INSTANCES_CUTS_CUT_MODEL_H
@@ -32,10 +32,10 @@ namespace cuts {
 
 //! Parameters for multicut
 struct CutParams {
-  double stepsize;  
+  double stepsize;
   double step_diminish;
   CutParams(float ss, float sd) : stepsize(ss), step_diminish(sd) { }
-}; 
+};
 
 //! mutable model for multicut
 class CutModel {
@@ -45,7 +45,9 @@ class CutModel {
   vector::FVector<double> *weights;
 
   void CopyFrom(const CutModel &m) {
-    vector::CopyInto(*m.weights, *weights);
+    for (int i = 0; i < n; i++) {
+      vector::CopyInto(*m.weights, *weights);
+    }
   }
 
   CutModel* Clone() {
@@ -67,6 +69,21 @@ class CutModel {
     printf("Sum of weights: %f\n", t);
   }
 
+  void Add(const CutModel& m) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < dim; j++) {
+        weights[i].values[j] += m.weights[i].values[j];
+      }
+    }
+  }
+  void AverageBy(unsigned num) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < dim; j++) {
+        weights[i].values[j] /= num;
+      }
+    }
+  }
+
   CutModel(int _n, std::set<int> &_terminals)
       : n(_n), Terminals(_terminals) {
     dim = (int) Terminals.size();
@@ -83,7 +100,7 @@ class CutModel {
       //printf("j = %d / %d\n", j, n);
     }
 
-    std::cout << "Zeroing " << dim << " terminals" << std::endl;      
+    std::cout << "Zeroing " << dim << " terminals" << std::endl;
     int counter = 0;
     for(std::set<int>::iterator i = Terminals.begin(); i != Terminals.end(); i++) {
       vector::Zero(weights[*i]);
@@ -98,28 +115,28 @@ class CutModel {
 
   // Accessors
   void set(int i, int j, double w) {
-    if(Terminals.find(i) == Terminals.end()) { weights[i].values[j] = w; }	
+    if(Terminals.find(i) == Terminals.end()) { weights[i].values[j] = w; }
   }
 
   vector::FVector<double>& get(int i) { return weights[i]; }
-  void set(int i, const vector::FVector<double> &x) { 
+  void set(int i, const vector::FVector<double> &x) {
     weights[i].size = x.size;
     weights[i].values = x.values;
   }
-  float get(int i, int j) const { 
-    assert(i >= 0 && i < n); 
+  float get(int i, int j) const {
+    assert(i >= 0 && i < n);
     //printf("&get = %llux\n", reinterpret_cast<size_t>(&weights[i].values[j]));
     return weights[i].values[j];
   }
   void project(int i) {
     if(Terminals.find(i) == Terminals.end())
-      vector::SimplexProject(weights[i]); 
+      vector::SimplexProject(weights[i]);
   }
-  int get_dim() const { return dim; }  
+  int get_dim() const { return dim; }
 
 };
 
-double compute_loss(const CutModel &m, const types::Entry &e);  
+double compute_loss(const CutModel &m, const types::Entry &e);
 
 typedef HogwildTask<CutModel, CutParams, types::Entry> CutTask;
 

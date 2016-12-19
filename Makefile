@@ -64,5 +64,9 @@ bin/cfsvm: obj/frontend.o
 	$(CPP) -o bin/cfsvm src/cfsvm_main.cc -I$(DOP_INCL) -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
 		obj/frontend.o
 
+bin/cfmulticut: obj/frontend.o
+	$(CPP) -o bin/cfmulticut src/cfmulticut.cc -I$(DOP_INCL) -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
+		obj/frontend.o
+
 clean:
 	rm -f $(ALL)
