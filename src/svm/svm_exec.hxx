@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #include "hazy/vector/dot-inl.h"
 #include "hazy/vector/scale_add-inl.h"
@@ -31,7 +31,7 @@ fp_type inline ComputeLoss(const SVMExample &e, const SVMModel& model) {
   return std::max(1 - dot * e.value, static_cast<fp_type>(0.0));
 }
 
-void inline ModelUpdate(const SVMExample &examp, const SVMParams &params, 
+void inline ModelUpdate(const SVMExample &examp, const SVMParams &params,
                  SVMModel *model) {
   vector::FVector<fp_type> &w = model->weights;
 
@@ -62,6 +62,19 @@ void SVMExec::PostUpdate(SVMModel &model, SVMParams &params) {
   params.step_size *= params.step_decay;
 }
 
+void SVMExec::Aggregate(vector::FVector<SVMModel*> &models, SVMParams &params) {
+  SVMModel* aggregated_model = models.values[0];
+  for (unsigned i = 1; i < models.size; i++) {
+    SVMModel* model = models.values[i];
+    for (unsigned j = 0; j < aggregated_model->weights.size; j++) {
+      aggregated_model->weights.values[j] += model->weights.values[j];
+    }
+  }
+  for (unsigned j = 0; j < aggregated_model->weights.size; j++) {
+    aggregated_model->weights.values[j] /= models.size;
+  }
+}
+
 double SVMExec::UpdateModel(SVMTask &task, unsigned tid, unsigned total) {
 
   SVMModel  &model = *task.model;
@@ -69,9 +82,9 @@ double SVMExec::UpdateModel(SVMTask &task, unsigned tid, unsigned total) {
   SVMParams const &params = *task.params;
   vector::FVector<SVMExample> const & exampsvec = task.block->ex;
   // calculate which chunk of examples we work on
-  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total); 
+  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total);
   size_t end = hogwild::GetEndIndex(exampsvec.size, tid, total);
-  // optimize for const pointers 
+  // optimize for const pointers
   size_t *perm = task.block->perm.values;
   SVMExample const * const examps = exampsvec.values;
   SVMModel * const m = &model;
@@ -91,7 +104,7 @@ double SVMExec::TestModel(SVMTask &task, unsigned tid, unsigned total) {
   vector::FVector<SVMExample> const & exampsvec = task.block->ex;
 
   // calculate which chunk of examples we work on
-  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total); 
+  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total);
   size_t end = hogwild::GetEndIndex(exampsvec.size, tid, total);
 
   // keep const correctness

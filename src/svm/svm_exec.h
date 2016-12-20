@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #ifndef HAZY_HOGWILD_INSTANCES_SVM_SVM_EXEC_H
 #define HAZY_HOGWILD_INSTANCES_SVM_SVM_EXEC_H
@@ -29,8 +29,8 @@ namespace hazy {
 namespace hogwild {
 namespace svm {
 
-//! Changes the model using the given example 
-void inline ModelUpdate(const SVMExample &examp, const SVMParams &params, 
+//! Changes the model using the given example
+void inline ModelUpdate(const SVMExample &examp, const SVMParams &params,
                  SVMModel *model, size_t &updates, size_t &count);
 
 //! Returns the loss for the given example and model
@@ -42,7 +42,7 @@ class SVMExec {
   /// Preforms updates to the model
   /*! Updates by scanning over examples, uses the thread id and total
    * number of threads to determine which chunk of examples to work on.
-   * \param task container of model, params, and examples 
+   * \param task container of model, params, and examples
    * \param tid the thread ID; 0 <= tid < total
    * \param total the total number of threads working on updating
    */
@@ -63,6 +63,9 @@ class SVMExec {
 
   static void PostEpoch(SVMModel &model, SVMParams &params) {
   }
+
+  //! Aggregate several peer models into the first model
+  static void Aggregate(vector::FVector<SVMModel*> &models, SVMParams &params);
 };
 
 } // namespace svm
