@@ -71,6 +71,7 @@ class CacheFriendlyHogwild{
       cfhogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
       {}
 
+
   template <class TrainScan, class TestScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
                      TrainScan &trscan, TestScan &tescan) {
