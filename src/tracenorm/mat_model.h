@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 
 #ifndef HAZY_HOGWILD_INSTANCES_MATFACT_MAT_MODEL_H
@@ -47,7 +47,7 @@ struct MFParams {
   size_t nRows, nCols;
 
   //! Expects to have the map applied below, parameter_map
-  void Setup(size_t _nRows, size_t _nCols, size_t _nExamples) { 
+  void Setup(size_t _nRows, size_t _nCols, size_t _nExamples) {
     assert(_nRows > 0 );
     assert(_nCols > 0 );
     nRows = _nRows;
@@ -141,13 +141,21 @@ struct MFModel {
 
   void CopyFrom(MFModel &m) {
     for (size_t i = 0; i < rows; i++) { //p.nRows; i++) {
-      memcpy(L[i].values, m.L[i].values, 
+      memcpy(L[i].values, m.L[i].values,
              sizeof(double)*L[0].size);
     }
     for (size_t i = 0; i < cols; i++) { //p.nRows; i++) {
-      memcpy(R[i].values, m.R[i].values, 
+      memcpy(R[i].values, m.R[i].values,
              sizeof(double)*R[0].size);
     }
+  }
+
+  void Add(const MFModel& m) {
+    //TODO
+  }
+
+  void AverageBy(unsigned num) {
+    //TODO
   }
 
   void OutputToFile(char const *name, const MFParams &p) {
@@ -210,13 +218,13 @@ void SetParamsByScan(Scan &scan, Params_t &params) {
   size_t nex = 0;
   size_t max_row = 0;
   size_t max_col = 0;
-  
+
   scan.Reset();
   while (scan.HasNext()) {
     const types::Entry &e = scan.Next();
-    if ( (e.col > 0) && (static_cast<size_t>(e.col) > max_col) ) 
+    if ( (e.col > 0) && (static_cast<size_t>(e.col) > max_col) )
       max_col = e.col;
-    if ( (e.row > 0) && (static_cast<size_t>(e.row) > max_row) ) 
+    if ( (e.row > 0) && (static_cast<size_t>(e.row) > max_row) )
       max_row = e.row;
     nex++;
   }

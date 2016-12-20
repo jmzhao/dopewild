@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #ifndef HAZY_HOGWILD_MATFACT_MAT_EXEC_H
 #define HAZY_HOGWILD_MATFACT_MAT_EXEC_H
@@ -28,9 +28,9 @@ namespace hogwild {
 namespace tnorm {
 
 //! Modifies the model using the single example
-void inline ModelUpdate(MFModel &model, MFParams const &params, 
+void inline ModelUpdate(MFModel &model, MFParams const &params,
                         types::Entry const &e);
-    
+
 //! Returns the loss of the single example using the given model
 double ComputeLoss(const MFModel &m, const types::Entry &e);
 
@@ -40,7 +40,7 @@ class MFExec {
   /// Preforms updates to the model
   /*! Updates by scanning over examples, uses the thread id and total
    * number of threads to determine which chunk of examples to work on.
-   * \param task container of model, params, and examples 
+   * \param task container of model, params, and examples
    * \param tid the thread ID; 0 <= tid < total
    * \param total the total number of threads working on updating
    */
@@ -55,6 +55,8 @@ class MFExec {
    * \param total the total number of threads working on updating
    */
   static double TestModel(TNormTask &task, unsigned tid, unsigned total);
+
+  static void Aggregate(vector::FVector<MFModel*> &models, MFParams &params);
 
   //! Invoked after each training epoch, causes the stepsize to decay
   static void PostUpdate(MFModel &model, MFParams &params) {

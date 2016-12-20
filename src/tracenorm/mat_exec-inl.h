@@ -14,7 +14,7 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
 
 #ifndef HAZY_TRACENORM_MAT_EXEC_INL_H
 #define HAZY_TRACENORM_MAT_EXEC_INL_H
@@ -37,8 +37,8 @@ double ComputeLoss(MFModel const &m, types::Entry const &e) {
   return err*err;
 }
 
-inline void ModelUpdate(MFModel &model, MFParams const &params, 
-                        types::Entry const &e, 
+inline void ModelUpdate(MFModel &model, MFParams const &params,
+                        types::Entry const &e,
                         vector::FVector<double> &swapL) {
   // declare things used later
   int row_index = e.row;
@@ -72,12 +72,12 @@ inline void ModelUpdate(MFModel &model, MFParams const &params,
 
 double MFExec::UpdateModel(TNormTask &task, unsigned tid, unsigned total) {
   MFModel &model = *task.model;
-  MFParams const &params = *task.params; 
+  MFParams const &params = *task.params;
   vector::FVector<types::Entry> const & exampsvec = task.block->ex;
 
   assert(params.L_degree != params.R_degree);
   // calculate which chunk of examples we work on
-  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total); 
+  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total);
   size_t end = hogwild::GetEndIndex(exampsvec.size, tid, total);
 
   types::Entry const * const examps = exampsvec.values;
@@ -96,11 +96,11 @@ double MFExec::UpdateModel(TNormTask &task, unsigned tid, unsigned total) {
 
 double MFExec::TestModel(TNormTask &task, unsigned tid, unsigned total) {
   MFModel const &model = *task.model;
-  //MFParams const &params = *task.params; 
+  //MFParams const &params = *task.params;
   vector::FVector<types::Entry> const & exampsvec = task.block->ex;
 
   // calculate which chunk of examples we work on
-  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total); 
+  size_t start = hogwild::GetStartIndex(exampsvec.size, tid, total);
   size_t end = hogwild::GetEndIndex(exampsvec.size, tid, total);
 
   // keep const correctness
@@ -112,11 +112,19 @@ double MFExec::TestModel(TNormTask &task, unsigned tid, unsigned total) {
   }
   // return the number of examples we used and the sum of the loss
   return loss;
-} 
+}
+
+void MFExec::Aggregate(vector::FVector<MFModel*> &models, MFParams &params) {
+  SVMModel* aggregated_model = models.values[0];
+  for (unsigned i = 1; i < models.size; i++) {
+    SVMModel* model = models.values[i];
+    aggregated_model->Add(*model);
+  }
+  aggregated_model->AverageBy(models.size);
+}
 
 } // namespace matfact
 } // namespace hogwild
 
 } // namespace hazy
 #endif
-
