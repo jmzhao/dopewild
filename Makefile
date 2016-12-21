@@ -1,5 +1,5 @@
 # C++ Compiler and options
-CPP=g++ -Wall -g -O3
+CPP=g++ -g -O3
 
 # Path to dopewild (e.g. dopewildtl/include)
 DOP_INCL=dopewildtl/include
