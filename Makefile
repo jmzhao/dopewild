@@ -16,7 +16,8 @@ ifneq ($(UNAME), Darwin)
 endif
 
 ALL= $(TOOLS) obj/frontend.o bin/svm bin/tracenorm bin/multicut \
-		 bin/bbtracenorm bin/predict bin/bbsvm bin/bbmulticut
+		 bin/bbtracenorm bin/predict bin/bbsvm bin/bbmulticut \
+		 bin/cfsvm
 
 all: $(ALL)
 
