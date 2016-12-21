@@ -25,7 +25,7 @@ obj/frontend.o:
 	$(CPP) -c src/frontend_util.cc -o obj/frontend.o
 
 bin/svm: obj/frontend.o
-	$(CPP) -o bin/svm src/svm_main.cc -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
+	$(CPP) -o bin/svm src/svm.cc -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
 		obj/frontend.o
 
 bin/bbsvm: obj/frontend.o
@@ -62,7 +62,7 @@ bin/unconvert: src/tools/unconvert.cc
 	$(CPP) -o bin/unconvert src/tools/unconvert.cc -I$(HOG_INCL) -I$(HTL_INCL)
 
 bin/cfsvm: obj/frontend.o
-	$(CPP) -o bin/cfsvm src/cfsvm_main.cc -I$(DOP_INCL) -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
+	$(CPP) -o bin/cfsvm src/cfsvm.cc -I$(DOP_INCL) -I$(HOG_INCL) -I$(HTL_INCL) -lpthread $(LIB_RT) \
 		obj/frontend.o
 
 clean:

@@ -14,7 +14,10 @@
 
 // Hogwild!, part of the Hazy Project
 // Author : Victor Bittorf (bittorf [at] cs.wisc.edu)
-// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)             
+// Original Hogwild! Author: Chris Re (chrisre [at] cs.wisc.edu)
+#ifndef HAZY_HOGWILD_INSTANCES_SVM_MAIN_CC
+#define HAZY_HOGWILD_INSTANCES_SVM_MAIN_CC
+
 #include <cstdlib>
 
 #include "hazy/hogwild/hogwild-inl.h"
@@ -62,15 +65,15 @@ int main(int argc, char** argv) {
     //{"shufflers", required_argument, NULL, 'q', "number of shufflers"},
     {"binary", required_argument,NULL, 'v', "load the file in a binary fashion"},
     {"matlab-tsv", required_argument,NULL, 'm', "load TSVs indexing from 1 instead of 0"},
-    {NULL,0,NULL,0,0} 
+    {NULL,0,NULL,0,0}
   };
 
   char usage_str[] = "<train file> <test file>";
   int c = 0, option_index = 0;
   option* opt_struct = convert_extended_options(long_options);
-  while( (c = getopt_long(argc, argv, "", opt_struct, &option_index)) != -1) 
+  while( (c = getopt_long(argc, argv, "", opt_struct, &option_index)) != -1)
   {
-    switch (c) { 
+    switch (c) {
       case 'v':
         loadBinary = (atoi(optarg) != 0);
         break;
@@ -101,14 +104,18 @@ int main(int argc, char** argv) {
   }
   SVMParams tp (step_size, step_decay, mu);
 
-  char * szTestFile, *szExampleFile;
-  
+  char * szTestFile=NULL, *szExampleFile=NULL;
+
   if(optind == argc - 2) {
     szExampleFile = argv[optind];
     szTestFile  = argv[optind+1];
   } else {
-    print_usage(long_options, argv[0], usage_str);
-    exit(-1);
+    if(optind == argc - 1) {
+      szExampleFile = argv[optind];
+    } else {
+      print_usage(long_options, argv[0], usage_str);
+      exit(-1);
+    }
   }
   //fp_type buf[50];
 
@@ -129,12 +136,14 @@ int main(int argc, char** argv) {
     TSVFileScanner scan(szExampleFile);
     nfeats = LoadSVMExamples(scan, train_examps);
   }
-  if (matlab_tsv) {
-    MatlabTSVFileScanner scantest(szTestFile);
-    LoadSVMExamples(scantest, test_examps);
-  } else {
-    TSVFileScanner scantest(szTestFile);
-    LoadSVMExamples(scantest, test_examps);
+  if (szTestFile != NULL) {
+    if (matlab_tsv) {
+      MatlabTSVFileScanner scantest(szTestFile);
+      LoadSVMExamples(scantest, test_examps);
+    } else {
+      TSVFileScanner scantest(szTestFile);
+      LoadSVMExamples(scantest, test_examps);
+    }
   }
 
   unsigned *degs = new unsigned[nfeats];
@@ -151,11 +160,16 @@ int main(int argc, char** argv) {
   hazy::thread::ThreadPool tpool(nthreads);
   tpool.Init();
   MemoryScan<SVMExample> mscan(train_examps);
-  Hogwild<SVMModel, SVMParams, SVMExec>  hw(m, tp, tpool);
-  MemoryScan<SVMExample> tscan(test_examps);
+  SVMHogwild  hw(m, tp, tpool);
 
-  hw.RunExperiment(nepochs, wall_clock, mscan, tscan);
+  if (szTestFile != NULL) {
+    MemoryScan<SVMExample> tscan(test_examps);
+    hw.RunExperiment(nepochs, wall_clock, mscan, tscan);
+  } else {
+    hw.RunExperiment(nepochs, wall_clock, mscan);
+  }
 
   return 0;
 }
 
+#endif
