@@ -61,7 +61,7 @@ class SVMExec {
   //! Invoked after each training epoch, causes the stepsize to decay
   static void PostUpdate(SVMModel &model, SVMParams &params);
 
-  static void PostEpoch(const SVMModel &model, const SVMParams &params) {
+  static void PostEpoch(SVMModel &model, SVMParams &params) {
   }
 
   //! Aggregate several peer models into the first model
