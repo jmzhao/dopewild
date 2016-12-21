@@ -1,7 +1,6 @@
 #include "hazy/hogwild/hogwild-inl.h"
 
 #include "svm/svmmodel.h"
-#include "svm/svm_loader.h"
 #include "svm/svm_exec.h"
 
 using namespace hazy;
