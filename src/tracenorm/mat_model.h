@@ -151,11 +151,29 @@ struct MFModel {
   }
 
   void Add(const MFModel& m) {
-    //TODO
+    for (size_t i = 0; i < rows; i++) {
+      for (size_t j = 0l j < L[0].size; j++) {
+        L[i].values[j] += m.L[i].values[j];
+      }
+    }
+    for (size_t i = 0; i < rows; i++) {
+      for (size_t j = 0l j < L[0].size; j++) {
+        R[i].values[j] += m.R[i].values[j];
+      }
+    }
   }
 
   void AverageBy(unsigned num) {
-    //TODO
+    for (size_t i = 0; i < rows; i++) {
+      for (size_t j = 0l j < L[0].size; j++) {
+        L[i].values[j] /= num;
+      }
+    }
+    for (size_t i = 0; i < rows; i++) {
+      for (size_t j = 0l j < L[0].size; j++) {
+        R[i].values[j] /= num;
+      }
+    }
   }
 
   void OutputToFile(char const *name, const MFParams &p) {
