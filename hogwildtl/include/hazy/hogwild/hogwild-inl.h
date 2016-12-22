@@ -62,23 +62,19 @@ template <class TrainScan, class TestScan>
 void Hogwild<Model, Params, Exec>::RunExperiment(
     int nepochs, hazy::util::Clock &wall_clock,
     TrainScan &trscan, TestScan &tescan) {
-  printf("wall_clock: %.5f\n", wall_clock.Read());
+  printf("wall_clock: %.5f    Going Hogwild!\n", wall_clock.Read());
   for (int e = 1; e <= nepochs; e++) {
     UpdateModel(trscan);
     Exec::PostUpdate(model_, params_);
     double train_rmse = ComputeRMSE(trscan);
     double test_rmse = ComputeRMSE(tescan);
 
-    printf("epoch: %d wall_clock: %.5f ",
-      e, wall_clock.Read());
+    printf("epoch: %d wall_clock: %.5f train_time: %.5f test_time: %.5f epoch_time: %.5f train_rmse: %.5f test_rmse: %.5f\n",
+           e, wall_clock.Read(), train_time_.value, test_time_.value,
+           epoch_time_.value, train_rmse, test_rmse);
+    fflush(stdout);
 
     Exec::PostEpoch(model_, params_);
-
-    printf("epoch_time: %.5f train_time: %.5f test_time: %.5f train_rmse: %.5f test_rmse: %.5f\n",
-      epoch_time_.value,
-      train_time_.value, test_time_.value,
-      train_rmse, test_rmse);
-    fflush(stdout);
   }
 }
 
@@ -86,22 +82,18 @@ template <class Model, class Params, class Exec>
 template <class TrainScan>
 void Hogwild<Model, Params, Exec>::RunExperiment(
     int nepochs, hazy::util::Clock &wall_clock, TrainScan &trscan) {
-  printf("wall_clock: %.5f\n", wall_clock.Read());
+  printf("wall_clock: %.5f    Going Hogwild!\n", wall_clock.Read());
   for (int e = 1; e <= nepochs; e++) {
     UpdateModel(trscan);
     Exec::PostUpdate(model_, params_);
     double train_rmse = ComputeRMSE(trscan);
 
-    printf("epoch: %d wall_clock: %.5f ",
-      e, wall_clock.Read());
+    printf("epoch: %d wall_clock: %.5f train_time: %.5f test_time: %.5f epoch_time: %.5f train_rmse: %.5f\n",
+           e, wall_clock.Read(), train_time_.value, test_time_.value,
+           epoch_time_.value, train_rmse);
+    fflush(stdout);
 
     Exec::PostEpoch(model_, params_);
-
-    printf("epoch_time: %.5f train_time: %.5f test_time: %.5f train_rmse: %.5f\n",
-      epoch_time_.value,
-      train_time_.value, test_time_.value,
-      train_rmse);
-    fflush(stdout);
   }
 }
 
