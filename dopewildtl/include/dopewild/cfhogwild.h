@@ -48,18 +48,17 @@ class CacheFriendlyHogwild{
     }
 
     static void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
-      for (int i = 0; i < cfmodel.models.size; i++) {
-        Exec::PostUpdate(*cfmodel.models.values[i], params);
-      }
-
       //! Aggregate models into the first model
       Exec::Aggregate(cfmodel.models, params);
+
+      Exec::PostUpdate(*cfmodel.models.values[0], params);
+
       for (int i = 1; i < cfmodel.models.size; i++) {
         cfmodel.models.values[i]->CopyFrom(*cfmodel.models.values[0]);
       }
     }
 
-    static void PostEpoch(CacheFriendlyModel &cfmodel, Params &params) {
+    static void PostEpoch(const CacheFriendlyModel &cfmodel, const Params &params) {
       for (int i = 0; i < cfmodel.models.size; i++) {
         Exec::PostEpoch(*cfmodel.models.values[i], params);
       }
