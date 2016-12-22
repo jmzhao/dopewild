@@ -4,12 +4,12 @@
 #include "svm/svm_exec.h"
 
 
-using dopewild::CacheFriendlyHogwild;
+using dopewild::CacheFriendly;
 
 using namespace hazy;
 using namespace hazy::hogwild;
 using namespace hazy::hogwild::svm;
 
-typedef CacheFriendlyHogwild<SVMModel, SVMParams, SVMExec, SVMExample> SVMHogwild;
+typedef CacheFriendly<SVMModel, SVMParams, SVMExec, SVMExample>::CacheFriendlyHogwild SVMHogwild;
 
 #include "svm_main.cc"

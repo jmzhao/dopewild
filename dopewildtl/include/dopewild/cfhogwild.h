@@ -56,30 +56,34 @@ struct CacheFriendly{
     }
   };
 
-  class CacheFriendlyHogwild : public Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> {
+  class CacheFriendlyHogwild : 
+    public Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> {
+
+    typedef Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> super;
+
    public:
     CacheFriendlyHogwild(Model &m, Params &p, hazy::thread::ThreadPool &tpool) :
-        Hogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
+        super(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
         {}
 
    public:
     void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
       //! Aggregate models into the first model
-      hogwild_.train_time_.Start();
-      aggregate_time_.Start();
+      this->train_time_.Start();
+      this->aggregate_time_.Start();
       Exec::Aggregate(cfmodel.models, params);
-      aggregate_time_.Pause();
-      hogwild_.train_time_.Pause();
+      this->aggregate_time_.Pause();
+      this->train_time_.Pause();
 
       Exec::PostUpdate(*cfmodel.models.values[0], params);
 
-      hogwild_.train_time_.Start();
-      aggregate_time_.Start();
+      this->train_time_.Start();
+      this->aggregate_time_.Start();
       for (int i = 1; i < cfmodel.models.size; i++) {
         cfmodel.models.values[i]->CopyFrom(*cfmodel.models.values[0]);
       }
-      aggregate_time_.Stop();
-      hogwild_.train_time_.Pause();
+      this->aggregate_time_.Stop();
+      this->train_time_.Pause();
     }
 
     template <class TrainScan, class TestScan>
@@ -88,17 +92,19 @@ struct CacheFriendly{
         TrainScan &trscan, TestScan &tescan) {
       printf("wall_clock: %.5f    Going CFHogwild!\n", wall_clock.Read());
       for (int e = 1; e <= nepochs; e++) {
-        UpdateModel(trscan);
-        PostUpdate(model_, params_);
-        double train_rmse = ComputeRMSE(trscan);
-        double test_rmse = ComputeRMSE(tescan);
+        this->UpdateModel(trscan);
+        PostUpdate(this->model_, this->params_);
+        double train_rmse = this->ComputeRMSE(trscan);
+        double test_rmse = this->ComputeRMSE(tescan);
 
         printf("epoch: %d wall_clock: %.5f train_time: %.5f test_time: %.5f epoch_time: %.5f aggregate_time: %.5f train_rmse: %.5f test_rmse: %.5f\n",
-               e, wall_clock.Read(), train_time_.value, test_time_.value,
-               epoch_time_.value, aggregate_time_.value, train_rmse, test_rmse);
+               e, wall_clock.Read(), 
+	       this->train_time_.value, this->test_time_.value,
+               this->epoch_time_.value, this->aggregate_time_.value, 
+	       train_rmse, test_rmse);
         fflush(stdout);
 
-        CacheFriendlyExec::PostEpoch(model_, params_);
+        CacheFriendlyExec::PostEpoch(this->model_, this->params_);
       }
     }
 
@@ -107,33 +113,35 @@ struct CacheFriendly{
         int nepochs, hazy::util::Clock &wall_clock, TrainScan &trscan) {
       printf("wall_clock: %.5f    Going CFHogwild!\n", wall_clock.Read());
       for (int e = 1; e <= nepochs; e++) {
-        UpdateModel(trscan);
-        PostUpdate(model_, params_);
-        double train_rmse = ComputeRMSE(trscan);
+        this->UpdateModel(trscan);
+        PostUpdate(this->model_, this->params_);
+        double train_rmse = this->ComputeRMSE(trscan);
 
         printf("epoch: %d wall_clock: %.5f train_time: %.5f test_time: %.5f epoch_time: %.5f aggregate_time: %.5f train_rmse: %.5f\n",
-               e, wall_clock.Read(), train_time_.value, test_time_.value,
-               epoch_time_.value, aggregate_time_.value, train_rmse);
+               e, wall_clock.Read(), 
+	       this->train_time_.value, this->test_time_.value,
+               this->epoch_time_.value, this->aggregate_time_.value, 
+	       train_rmse);
         fflush(stdout);
 
-        CacheFriendlyExec::PostEpoch(model_, params_);
+        CacheFriendlyExec::PostEpoch(this->model_, this->params_);
       }
     }
 
     // template <class TrainScan, class TestScan>
     // void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
     //                    TrainScan &trscan, TestScan &tescan) {
-    //   hogwild_.RunExperiment(nepochs, wall_clock, trscan, tescan);
+    //   RunExperiment(nepochs, wall_clock, trscan, tescan);
     // }
     //
     // template <class TrainScan>
     // void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
     //                    TrainScan &trscan) {
-    //   hogwild_.RunExperiment(nepochs, wall_clock, trscan);
+    //   RunExperiment(nepochs, wall_clock, trscan);
     // }
 
    private:
-    Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> hogwild_;
+    // Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> hogwild_;
     hazy::util::Clock aggregate_time_;
   };
 };

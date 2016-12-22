@@ -75,7 +75,7 @@ class Hogwild {
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock, 
                      TrainScan &trscan);
  
- private:
+ protected:
   hazy::util::Clock train_time_; //!< measures total time spent in UpdateModel
   hazy::util::Clock test_time_; //!< measures total time in spent in ComputeRMSE
   hazy::util::Clock epoch_time_; //!< measures the time spent in most recent Update
