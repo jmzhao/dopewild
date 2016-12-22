@@ -62,7 +62,7 @@ template <class TrainScan, class TestScan>
 void Hogwild<Model, Params, Exec>::RunExperiment(
     int nepochs, hazy::util::Clock &wall_clock,
     TrainScan &trscan, TestScan &tescan) {
-  printf("wall_clock: %.5f    Going CFHogwild!\n", wall_clock.Read());
+  printf("wall_clock: %.5f\n", wall_clock.Read());
   for (int e = 1; e <= nepochs; e++) {
     UpdateModel(trscan);
     Exec::PostUpdate(model_, params_);
@@ -86,7 +86,7 @@ template <class Model, class Params, class Exec>
 template <class TrainScan>
 void Hogwild<Model, Params, Exec>::RunExperiment(
     int nepochs, hazy::util::Clock &wall_clock, TrainScan &trscan) {
-  printf("wall_clock: %.5f    Going CFHogwild!\n", wall_clock.Read());
+  printf("wall_clock: %.5f\n", wall_clock.Read());
   for (int e = 1; e <= nepochs; e++) {
     UpdateModel(trscan);
     Exec::PostUpdate(model_, params_);

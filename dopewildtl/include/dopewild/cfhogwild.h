@@ -49,42 +49,51 @@ class CacheFriendlyHogwild{
 
     static void PostUpdate(CacheFriendlyModel &cfmodel, Params &params) {
       //! Aggregate models into the first model
+      hogwild_.train_time_.Start();
+      aggregate_time_.Start();
       Exec::Aggregate(cfmodel.models, params);
+      aggregate_time_.Pause();
+      hogwild_.train_time_.Pause();
 
       Exec::PostUpdate(*cfmodel.models.values[0], params);
 
+      hogwild_.train_time_.Start();
+      aggregate_time_.Start();
       for (int i = 1; i < cfmodel.models.size; i++) {
         cfmodel.models.values[i]->CopyFrom(*cfmodel.models.values[0]);
       }
+      aggregate_time_.Stop();
+      hogwild_.train_time_.Pause();
     }
 
     static void PostEpoch(const CacheFriendlyModel &cfmodel, const Params &params) {
       for (int i = 0; i < cfmodel.models.size; i++) {
         Exec::PostEpoch(*cfmodel.models.values[i], params);
       }
+      printf("aggregate_time: %.5f", aggregate_time_.value);
     }
   };
 
  public:
   CacheFriendlyHogwild(Model &m, Params &p, hazy::thread::ThreadPool &tpool) :
-      cfhogwild(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
+      hogwild_(*(new CacheFriendlyModel(m, tpool.ThreadCount())), p, tpool)
       {}
 
 
   template <class TrainScan, class TestScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
                      TrainScan &trscan, TestScan &tescan) {
-    cfhogwild.RunExperiment(nepochs, wall_clock, trscan, tescan);
+    hogwild_.RunExperiment(nepochs, wall_clock, trscan, tescan);
   }
 
   template <class TrainScan>
   void RunExperiment(int nepochs, hazy::util::Clock &wall_clock,
                      TrainScan &trscan) {
-    cfhogwild.RunExperiment(nepochs, wall_clock, trscan);
+    hogwild_.RunExperiment(nepochs, wall_clock, trscan);
   }
 
  private:
-  Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> cfhogwild;
+  Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> hogwild_;
   hazy::util::Clock aggregate_time_; //!< measures the time spent in most recent Aggregate
 };
 
