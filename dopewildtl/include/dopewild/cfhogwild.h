@@ -86,6 +86,7 @@ class CacheFriendlyHogwild{
 
  private:
   Hogwild<CacheFriendlyModel, Params, CacheFriendlyExec> cfhogwild;
+  hazy::util::Clock aggregate_time_; //!< measures the time spent in most recent Aggregate
 };
 
 } // namespace dopewild
